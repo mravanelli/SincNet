@@ -262,60 +262,61 @@ for epoch in range(N_epochs):
    loss_sum=0
    err_sum=0
    err_sum_snt=0
-      
-   for i in range(snt_te):
+   
+   with torch.no_grad():  
+    for i in range(snt_te):
        
-    #[fs,signal]=scipy.io.wavfile.read(data_folder+wav_lst_te[i])
-    #signal=signal.astype(float)/32768
+     #[fs,signal]=scipy.io.wavfile.read(data_folder+wav_lst_te[i])
+     #signal=signal.astype(float)/32768
 
-    [signal, fs] = sf.read(data_folder+wav_lst_te[i])
+     [signal, fs] = sf.read(data_folder+wav_lst_te[i])
 
-    signal=torch.from_numpy(signal).float().cuda().contiguous()
-    lab_batch=lab_dict[wav_lst_te[i]]
+     signal=torch.from_numpy(signal).float().cuda().contiguous()
+     lab_batch=lab_dict[wav_lst_te[i]]
     
-    # split signals into chunks
-    beg_samp=0
-    end_samp=wlen
+     # split signals into chunks
+     beg_samp=0
+     end_samp=wlen
      
-    N_fr=int((signal.shape[0]-wlen)/(wshift))
+     N_fr=int((signal.shape[0]-wlen)/(wshift))
      
 
-    sig_arr=np.zeros([Batch_dev,wlen])
-    lab= Variable((torch.zeros(N_fr+1)+lab_batch).cuda().contiguous().long(),volatile=True)
-    pout=Variable(torch.zeros(N_fr+1,class_lay[-1]).float().cuda().contiguous(),volatile=True)
-    count_fr=0
-    count_fr_tot=0
-    while end_samp<signal.shape[0]:
+     sig_arr=np.zeros([Batch_dev,wlen])
+     lab= Variable((torch.zeros(N_fr+1)+lab_batch).cuda().contiguous().long())
+     pout=Variable(torch.zeros(N_fr+1,class_lay[-1]).float().cuda().contiguous())
+     count_fr=0
+     count_fr_tot=0
+     while end_samp<signal.shape[0]:
          sig_arr[count_fr,:]=signal[beg_samp:end_samp]
          beg_samp=beg_samp+wshift
          end_samp=beg_samp+wlen
          count_fr=count_fr+1
          count_fr_tot=count_fr_tot+1
          if count_fr==Batch_dev:
-             inp=Variable(torch.from_numpy(sig_arr).float().cuda().contiguous(),volatile=True)
+             inp=Variable(torch.from_numpy(sig_arr).float().cuda().contiguous())
              pout[count_fr_tot-Batch_dev:count_fr_tot,:]=DNN2_net(DNN1_net(CNN_net(inp)))
              count_fr=0
              sig_arr=np.zeros([Batch_dev,wlen])
    
-    if count_fr>0:
-     inp=Variable(torch.from_numpy(sig_arr[0:count_fr]).float().cuda().contiguous(),volatile=True)
-     pout[count_fr_tot-count_fr:count_fr_tot,:]=DNN2_net(DNN1_net(CNN_net(inp)))
+     if count_fr>0:
+      inp=Variable(torch.from_numpy(sig_arr[0:count_fr]).float().cuda().contiguous())
+      pout[count_fr_tot-count_fr:count_fr_tot,:]=DNN2_net(DNN1_net(CNN_net(inp)))
 
     
-    pred=torch.max(pout,dim=1)[1]
-    loss = cost(pout, lab.long())
-    err = torch.mean((pred!=lab.long()).float())
+     pred=torch.max(pout,dim=1)[1]
+     loss = cost(pout, lab.long())
+     err = torch.mean((pred!=lab.long()).float())
     
-    [val,best_class]=torch.max(torch.sum(pout,dim=0),0)
-    err_sum_snt=err_sum_snt+(best_class!=lab[0]).float()
+     [val,best_class]=torch.max(torch.sum(pout,dim=0),0)
+     err_sum_snt=err_sum_snt+(best_class!=lab[0]).float()
     
     
-    loss_sum=loss_sum+loss.detach()
-    err_sum=err_sum+err.detach()
+     loss_sum=loss_sum+loss.detach()
+     err_sum=err_sum+err.detach()
     
-   err_tot_dev_snt=err_sum_snt/snt_te
-   loss_tot_dev=loss_sum/snt_te
-   err_tot_dev=err_sum/snt_te
+    err_tot_dev_snt=err_sum_snt/snt_te
+    loss_tot_dev=loss_sum/snt_te
+    err_tot_dev=err_sum/snt_te
 
   
    print("epoch %i, loss_tr=%f err_tr=%f loss_te=%f err_te=%f err_te_snt=%f" % (epoch, loss_tot,err_tot,loss_tot_dev,err_tot_dev,err_tot_dev_snt))
@@ -331,6 +332,5 @@ for epoch in range(N_epochs):
   
   else:
    print("epoch %i, loss_tr=%f err_tr=%f" % (epoch, loss_tot,err_tot))
-
 
 
