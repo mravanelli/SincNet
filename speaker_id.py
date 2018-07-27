@@ -85,8 +85,7 @@ cnn_use_laynorm=list(map(str_to_bool, options.cnn_use_laynorm.split(',')))
 cnn_use_batchnorm=list(map(str_to_bool, options.cnn_use_batchnorm.split(',')))
 cnn_act=list(map(str, options.cnn_act.split(',')))
 cnn_drop=list(map(float, options.cnn_drop.split(',')))
-cnn_init_first=options.cnn_init_first
-cnn_init_gain=float(options.cnn_init_gain)
+
 
 #[dnn]
 fc_lay=list(map(int, options.fc_lay.split(',')))
@@ -113,8 +112,6 @@ batch_size=int(options.batch_size)
 N_epochs=int(options.N_epochs)
 N_batches=int(options.N_batches)
 N_eval_epoch=int(options.N_eval_epoch)
-reg_factor=float(options.reg_factor)
-fact_amp=float(options.fact_amp)
 seed=int(options.seed)
 
 
