@@ -54,7 +54,7 @@ class sinc_conv(nn.Module):
         
         filters=Variable(torch.zeros((self.N_filt,self.Filt_dim))).cuda()
         N=self.Filt_dim
-        t_right=Variable(torch.linspace(1, (N-1)/2, steps=(N-1)/2)/self.fs).cuda()
+        t_right=Variable(torch.linspace(1, (N-1)/2, steps=int((N-1)/2))/self.fs).cuda()
         
         
         min_freq=50.0;
