@@ -47,8 +47,7 @@ def read_conf():
  options.cnn_use_batchnorm=Config.get('cnn', 'cnn_use_batchnorm')
  options.cnn_act=Config.get('cnn', 'cnn_act')
  options.cnn_drop=Config.get('cnn', 'cnn_drop')
- options.cnn_init_first=Config.get('cnn', 'cnn_init_first')
- options.cnn_init_gain=Config.get('cnn', 'cnn_init_gain')
+
 
  #[dnn]
  options.fc_lay=Config.get('dnn', 'fc_lay')
@@ -75,8 +74,6 @@ def read_conf():
  options.N_epochs=Config.get('optimization', 'N_epochs')
  options.N_batches=Config.get('optimization', 'N_batches')
  options.N_eval_epoch=Config.get('optimization', 'N_eval_epoch')
- options.reg_factor=Config.get('optimization', 'reg_factor')
- options.fact_amp=Config.get('optimization', 'fact_amp')
  options.seed=Config.get('optimization', 'seed')
  
  return options

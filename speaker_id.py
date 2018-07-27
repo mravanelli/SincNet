@@ -158,9 +158,7 @@ CNN_arch = {'input_dim': wlen,
           'cnn_use_laynorm':cnn_use_laynorm,
           'cnn_use_batchnorm':cnn_use_batchnorm,
           'cnn_act': cnn_act,
-          'cnn_drop':cnn_drop,
-          'cnn_init_first':cnn_init_first,
-          'cnn_init_gain':cnn_init_gain,          
+          'cnn_drop':cnn_drop,          
           }
 
 CNN_net=CNN(CNN_arch)
@@ -226,7 +224,7 @@ for epoch in range(N_epochs):
 
   for i in range(N_batches):
 
-    [inp,lab]=create_batches_rnd(batch_size,data_folder,wav_lst_tr,snt_tr,wlen,lab_dict,fact_amp)
+    [inp,lab]=create_batches_rnd(batch_size,data_folder,wav_lst_tr,snt_tr,wlen,lab_dict,0.2)
     pout=DNN2_net(DNN1_net(CNN_net(inp)))
     
     pred=torch.max(pout,dim=1)[1]
