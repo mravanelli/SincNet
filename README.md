@@ -1,7 +1,9 @@
 # SincNet:
-SincNet is a neural architecture for processing raw audio samples. It is a novel CNN architecture that encourages the first convolutional layer to discover more meaningful filters. SincNet is based on parametrized sinc functions, which implement band-pass filters.
+SincNet is a neural architecture for processing **raw audio samples**. It is a novel CNN architecture that encourages the first convolutional layer to discover more **meaningful filters**. SincNet is based on parametrized sinc functions, which implement band-pass filters.
 
-In contrast to standard CNNs, that learn all elements of each filter, only low and high cutoff frequencies are directly learned from data with the proposed method. This offers a very compact and efficient way to derive a customized filter bank specifically tuned for the desired application. This project releases a collection of codes and utilities to perform speaker identification with SincNet.
+In contrast to standard CNNs, that learn all elements of each filter, only low and high cutoff frequencies are directly learned from data with the proposed method. This offers a very compact and efficient way to derive a **customized filter bank** specifically tuned for the desired application. 
+
+This project releases a collection of codes and utilities to perform speaker identification with SincNet.
 An example of speaker identification with the TIMIT database is provided. 
 
 ![alt text](https://github.com/mravanelli/SincNet/blob/master/SincNet.png)
@@ -21,7 +23,7 @@ Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with Si
 ## How to run a TIMIT experiment:
 Even though the code can be easily adapted to any speech dataset, in the following part of the documentation we provide an example based on the popular TIMIT dataset.
 
-**1. Run TIMIT data preparation.
+**1. Run TIMIT data preparation.**
 
 This step is necessary to store a version of TIMIT in which start and end silences are removed and the amplitute of the signal is normalized. To do it, run the following code:
 
@@ -33,7 +35,7 @@ where:
 - *$OUTPUT_FOLDER* is the folder where the normalized TIMIT will be stored
 - *data_lists/TIMIT_all.scp* is the list of TIMIT files used for training/test the proposed system
 
-**2. Run the speaker id experiment.
+**2. Run the speaker id experiment.**
 
 - Modify the *cfg/SincNet_TIMIT.cfg* file according to your paths. In particular, modify the *data_folder* with *$OUTPUT_FOLDER* specified during the TIMIT preparation. The other parameters of the config file fall under the following categories:
 - *[windowing]*, that defines how each sentence is splitted into smaller chunks
