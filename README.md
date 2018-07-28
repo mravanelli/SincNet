@@ -9,7 +9,7 @@ An example of speaker identification with the TIMIT database is provided.
 <img src="https://github.com/mravanelli/SincNet/blob/master/SincNet.png" width="400" img align="right">
 
 ## Cite us
-If you use this codes or part of it, please cite us!
+If you use this code or part of it, please cite us!
 
 *Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with SincNet” Arxiv*
 
@@ -34,8 +34,8 @@ python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER data_lists/TIMIT_all.sc
 ``
 
 where:
-- *$TIMIT_FOLDER* is the folder where the original TIMIT corpus is stored
-- *$OUTPUT_FOLDER* is the folder where the normalized TIMIT will be stored
+- *$TIMIT_FOLDER* is the folder of the original TIMIT corpus
+- *$OUTPUT_FOLDER* is the folder in which the normalized TIMIT will be stored
 - *data_lists/TIMIT_all.scp* is the list of the TIMIT files used for training/test the speaker id system.
 
 **2. Run the speaker id experiment.**
@@ -53,12 +53,12 @@ where:
 python speaker_id.py --cfg=cfg/SincNet_TIMIT.cfg
 ``
 
-The network might take a number of hours depending on the speed of your GPU card to converge. In our case, using an *nvidia TITAN X*, the full training took about 24 hours. If you use the code within a cluster is crucial to copy the normalized dataset into the local node, since the current version of the code requires frequent accesses to the stored wav files. Note that several possible optimizations to improve the code speed are not implemented in this version, since are out of the scope of this work.
+The network might take several hours to converge (depending on the speed of your GPU card). In our case, using an *nvidia TITAN X*, the full training took about 24 hours. If you use the code within a cluster is crucial to copy the normalized dataset into the local node, since the current version of the code requires frequent accesses to the stored wav files. Note that several possible optimizations to improve the code speed are not implemented in this version, since are out of the scope of this work.
 
 **3. Results.**
 
-The results are saved into the *output_folder* specified in the cfg file. In this folder, you can find a file (*res.res*) summarizing training and test error rates. The model *model_raw.pkl* is model saved during the last iteration. 
-Using the cfg file specified above we obtain the following results:
+The results are saved into the *output_folder* specified in the cfg file. In this folder, you can find a file (*res.res*) summarizing training and test error rates. The model *model_raw.pkl* is the SincNet model saved after the last iteration. 
+Using the cfg file specified above, we obtain the following results:
 
 ## Where SincNet is implemented?
 To take a look into the SincNet implementation you should open the file *dnn_models.py* and read the classes *SincNet*, *sinc_conv* and the function *sinc*.
