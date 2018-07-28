@@ -8,7 +8,7 @@ Tested on:
 
 
 ``
-python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER
+python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER data_lists/TIMIT_all.scp
 ``
 
 ``
