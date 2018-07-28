@@ -1,5 +1,5 @@
 # SincNet:
-SincNet is a neural architecture for processing **raw audio samples**. It is a novel CNN architecture that encourages the first convolutional layer to discover more **meaningful filters**. SincNet is based on parametrized sinc functions, which implement band-pass filters.
+SincNet is a neural architecture for processing **raw audio samples**. It is a novel Convolutional Neural Network (CNN) that encourages the first convolutional layer to discover more **meaningful filters**. SincNet is based on parametrized sinc functions, which implement band-pass filters.
 
 In contrast to standard CNNs, that learn all elements of each filter, only low and high cutoff frequencies are directly learned from data with the proposed method. This offers a very compact and efficient way to derive a **customized filter bank** specifically tuned for the desired application. 
 
@@ -38,18 +38,20 @@ where:
 
 **2. Run the speaker id experiment.**
 
-- Modify the *cfg/SincNet_TIMIT.cfg* file according to your paths. In particular, modify the *data_folder* with *$OUTPUT_FOLDER* specified during the TIMIT preparation. The other parameters of the config file fall under the following categories:
-- *[windowing]*, that defines how each sentence is splitted into smaller chunks
-- *[cnn]*,  that specifies the characteristics of the CNN architecture
-- *[dnn]*,  that specifies the characteristics of the fully-connected DNN architecture following the CNN layers
-- *[class]*, that specify the softmax classification part.
-- *[optimization]*, that reports the main hyperparameters used to train the architecture
+- Modify the *[data]* section of *cfg/SincNet_TIMIT.cfg* file according to your paths. In particular, modify the *data_folder* with the *$OUTPUT_FOLDER* specified during the TIMIT preparation. The other parameters of the config file belong to the following sections:
+ 1. *[windowing]*, that defines how each sentence is splitted into smaller chunks.
+ 2. *[cnn]*,  that specifies the characteristics of the CNN architecture.
+ 3. *[dnn]*,  that specifies the characteristics of the fully-connected DNN architecture following the CNN layers.
+ 4. *[class]*, that specify the softmax classification part.
+ 5. *[optimization]*, that reports the main hyperparameters used to train the architecture.
 
-Once setup the cfg file, you can run the speaker id experiments using the following command:
+- Once setup the cfg file, you can run the speaker id experiments using the following command:
 
 ``
 python speaker_id.py --cfg=cfg/SincNet_TIMIT.cfg
 ``
+
+The full run of the code might take a number of hours depending on the speed of your GPU card. In our case, using an nvidia TITAN X, the full training took about 24 hours. If you use the code within a cluster is crucial to copy the normalized dataset into the local node, since the current version of the code requires frequent accesses to the stored wav files.
 
 **3. Results.**
 
