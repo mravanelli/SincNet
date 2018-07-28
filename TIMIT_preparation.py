@@ -11,12 +11,13 @@
 # It removes start and end silences according to the information reported in the *.wrd files and normalizes the amplitude of each sentence.
  
 # How to run it:
-# python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER
+# python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER data_lists/TIMIT_all.scp 
 
 import shutil
 import os
 import soundfile as sf
 import numpy as np
+import sys
 
 def ReadList(list_file):
  f=open(list_file,"r")
@@ -36,9 +37,9 @@ def ig_f(dir, files):
 
 
 
-in_folder='/home/mirco/Dataset/TIMIT/'
-out_folder='/home/mirco/Dataset/TIMIT_norm_new'
-list_file='data_lists/TIMIT_all.scp'
+in_folder=sys.argv[1]
+out_folder=sys.argv[2]
+list_file=sys.argv[3]
 
 # Read List file
 list_sig=ReadList(list_file)
