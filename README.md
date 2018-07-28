@@ -1,19 +1,19 @@
 # SincNet:
-SincNet is a neural architecture for processing raw audio samples. It is a novel CNN architecture that encourages the first convolutional layer to discover more meaningful filters. SincNet is based on parametrized sinc functions, which implement band-pass filters. In contrast to standard CNNs, that learn all elements of each filter, only low and high cutoff frequencies are directly learned from data with the proposed method. This offers a very compact and efficient way to derive a customized filter bank specifically tuned for the desired application.
+SincNet is a neural architecture for processing raw audio samples. It is a novel CNN architecture that encourages the first convolutional layer to discover more meaningful filters. SincNet is based on parametrized sinc functions, which implement band-pass filters. In contrast to standard CNNs, that learn all elements of each filter, only low and high cutoff frequencies are directly learned from data with the proposed method. This offers a very compact and efficient way to derive a customized filter bank specifically tuned for the desired application. This project releases a collection of codes and utilities to perform speaker identification with SincNet.
+An example of speaker identification with the TIMIT database is provided. 
 
-# Cite us:
+![alt text](https://github.com/mravanelli/SincNet/blob/master/SincNet.png)
+
+## Cite us:
 Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with SincNet” Arxiv
 
-## Introduction:
-This project releases a collection of codes and utilities to perform speaker identification with SincNet.
-An example of speaker identification with the TIMIT database is provided. 
 
 ## Prerequisites:
 - Linux
 - Python 3.6/2.7
 - pytorch 0.4.0
 - pysoundfile (``` conda install -c conda-forge pysoundfile```)
-We also suggest to use the anaconda environment.
+- We also suggest to use the anaconda environment.
 
 
 ## How to run a TIMIT experiment:
