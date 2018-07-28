@@ -6,7 +6,7 @@ In contrast to standard CNNs, that learn all elements of each filter, only low a
 This project releases a collection of codes and utilities to perform speaker identification with SincNet.
 An example of speaker identification with the TIMIT database is provided. 
 
-![alt text](https://github.com/mravanelli/SincNet/blob/master/SincNet.png)
+![alt text](https://github.com/mravanelli/SincNet/blob/master/SincNet.png | width=100)
 
 ## Cite us:
 Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with SincNet” Arxiv
@@ -25,11 +25,12 @@ Even though the code can be easily adapted to any speech dataset, in the followi
 
 **1. Run TIMIT data preparation.**
 
-This step is necessary to store a version of TIMIT in which start and end silences are removed and the amplitute of the signal is normalized. To do it, run the following code:
+This step is necessary to store a version of TIMIT in which start and end silences are removed and the amplitute of each speech utterance is normalized. To do it, run the following code:
 
 ``
 python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER data_lists/TIMIT_all.scp
 ``
+
 where:
 - *$TIMIT_FOLDER* is the folder where the original TIMIT corpus is stored
 - *$OUTPUT_FOLDER* is the folder where the normalized TIMIT will be stored
@@ -55,7 +56,7 @@ The results are saved into the *output_folder* specified in the cfg file. In thi
 Using the cfg file specified above we obtain the following results:
 
 ## Where SincNet is implemented?
-To take a look into the SincNet implementation you should open the file *dnn_models.py* and read the classes SincNet, sinc_conv and the function sinc.
+To take a look into the SincNet implementation you should open the file *dnn_models.py* and read the classes *SincNet*, *sinc_conv* and the function *sinc*.
 
 ## References
 
