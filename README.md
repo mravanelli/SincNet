@@ -50,7 +50,8 @@ Once setup the cfg file, you can run the speaker id experiments using the follow
 ``
 python speaker_id.py --cfg=cfg/SincNet_TIMIT.cfg
 ``
-## TIMIT Results:
+
+**3. Results.**
 
 The results are saved into the *output_folder* specified in the cfg file. In this folder, you can find a file (*res.res*) summarizing training and test error rates. The model *model_raw.pkl* is model saved during the last iteration. 
 Using the cfg file specified above we obtain the following results:
