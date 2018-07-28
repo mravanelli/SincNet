@@ -6,7 +6,7 @@ In contrast to standard CNNs, that learn all elements of each filter, only low a
 This project releases a collection of codes and utilities to perform speaker identification with SincNet.
 An example of speaker identification with the TIMIT database is provided. 
 
-![alt text](https://github.com/mravanelli/SincNet/blob/master/SincNet.png | width=100)
+![alt text](https://github.com/mravanelli/SincNet/blob/master/SincNet.png)
 
 ## Cite us:
 Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with SincNet” Arxiv
