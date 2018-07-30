@@ -62,7 +62,6 @@ The network might take several hours to converge (depending on the speed of your
 The results are saved into the *output_folder* specified in the cfg file. In this folder, you can find a file (*res.res*) summarizing training and test error rates. The model *model_raw.pkl* is the SincNet model saved after the last iteration. 
 Using the cfg file specified above, we obtain the following results:
 ```
-epoch 0, loss_tr=6.309807 err_tr=0.997656 loss_te=6.332657 err_te=0.997605 err_te_snt=0.996392
 epoch 0, loss_tr=5.542032 err_tr=0.984189 loss_te=4.996982 err_te=0.969038 err_te_snt=0.919913
 epoch 8, loss_tr=1.693487 err_tr=0.434424 loss_te=2.735717 err_te=0.612260 err_te_snt=0.069264
 epoch 16, loss_tr=0.861834 err_tr=0.229424 loss_te=2.465258 err_te=0.520276 err_te_snt=0.038240
