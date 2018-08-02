@@ -1,4 +1,3 @@
-Work in Progress. The final version of the code will be available in few days.
 
 # SincNet
 SincNet is a neural architecture for processing **raw audio samples**. It is a novel Convolutional Neural Network (CNN) that encourages the first convolutional layer to discover more **meaningful filters**. SincNet is based on parametrized sinc functions, which implement band-pass filters.
@@ -13,7 +12,7 @@ An example of speaker identification with the TIMIT database is provided.
 ## Cite us
 If you use this code or part of it, please cite us!
 
-*Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with SincNet” Arxiv*
+*Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with SincNet”* [Arxiv](http://arxiv.org/abs/1808.00158)
 
 
 ## Prerequisites
@@ -87,4 +86,4 @@ To take a look into the SincNet implementation you should open the file *dnn_mod
 
 ## References
 
-[1] Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with SincNet” Arxiv
+[1] Mirco Ravanelli, Yoshua Bengio, “Speaker Recognition from raw waveform with SincNet” [Arxiv](http://arxiv.org/abs/1808.00158)
