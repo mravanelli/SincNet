@@ -5,7 +5,7 @@ SincNet is a neural architecture for processing **raw audio samples**. It is a n
 In contrast to standard CNNs, that learn all elements of each filter, only low and high cutoff frequencies are directly learned from data with the proposed method. This offers a very compact and efficient way to derive a **customized filter bank** specifically tuned for the desired application. 
 
 This project releases a collection of codes and utilities to perform speaker identification with SincNet.
-An example of speaker identification with the TIMIT database is provided. 
+An example of speaker identification with the TIMIT database is provided. If you are interested to SincNet applied to speech recogntion you can take a look into the PyTorch-Kaldi github repository (https://github.com/mravanelli/pytorch-kaldi). 
 
 <img src="https://github.com/mravanelli/SincNet/blob/master/SincNet.png" width="400" img align="right">
 
