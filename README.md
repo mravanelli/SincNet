@@ -9,6 +9,8 @@ An example of speaker identification with the TIMIT database is provided. If you
 
 <img src="https://github.com/mravanelli/SincNet/blob/master/SincNet.png" width="400" img align="right">
 
+[Take a look into our video introduction to SincNet](https://www.youtube.com/watch?v=mXQBObRGUgk&feature=youtu.be)
+
 ## Cite us
 If you use this code or part of it, please cite us!
 
