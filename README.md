@@ -95,6 +95,8 @@ The labels are  specified within a python dictionary that contains sentence ids 
 
 You should then modify the config file (*cfg/SincNet_TIMIT.cfg*) according to your new paths. Remember also to change the field "*class_lay=462*" according to the number of speakers N_spks you have in your dataset.
 
+**The version of the Librispeech dataset used in the paper is available upon request**. In our work, we have used only 12-15 seconds of training material for each speaker and we processed the original librispeech sentences in order to perform amplitude normalization. Moreover, we used a simple energy-based VAD to avoid silences at the beginning and end of each sentence as well as to split in multiple chunks the sentences that contains longer silence
+
 
 
 ## References
