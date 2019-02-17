@@ -86,13 +86,13 @@ epoch 352, loss_tr=0.031828 err_tr=0.009238 loss_te=4.080747 err_te=0.414066 err
 epoch 360, loss_tr=0.033095 err_tr=0.009600 loss_te=4.254683 err_te=0.419954 err_te_snt=0.005772
 ``` 
 The converge is initially very fast (see the first 30 epochs). After that the performance improvement decreases and oscillations into the sentence error rate performance appear. Despite these oscillations an average improvement trend can be observed for the subsequent epochs. In this experiment, we stopped our training  at epoch 360.
-The fields of the res.res generated res.res file have the following meaning:
+The fields of the res.res file have the following meaning:
 - loss_tr: is the average training loss (i.e., cross-entropy function) computed at every frame.
 - err_tr: is the classification error (measured at frame level) of the training data. Note that we split the speech signals into chunks of 200ms with 10ms overlap. The error is averaged for all the chunks of the training dataset.
 - loss_te is the average test loss (i.e., cross-entropy function) computed at every frame.
 - err_te: is the classification error (measured at frame level) of the test data.
-- err_te_snt: is the classification error (measured at sentence level) of the test data. Note that we slit the speech signal into chunks of 200ms with 10ms overlap. For each chunk, our SincNet performs a prediction over the set of speakers. To compute this classification error rare we averaged the predictions and, for each sentence, we decided for the speaker with the highest average probability.
--
+- err_te_snt: is the classification error (measured at sentence level) of the test data. Note that we split the speech signal into chunks of 200ms with 10ms overlap. For each chunk, our SincNet performs a prediction over the set of speakers. To compute this classification error rate we averaged the predictions and, for each sentence, we voted for the speaker with the highest average probability.
+
 
 ## Where SincNet is implemented?
 To take a look into the SincNet implementation you should open the file *dnn_models.py* and read the classes *SincNet*, *sinc_conv* and the function *sinc*.
