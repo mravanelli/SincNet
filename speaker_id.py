@@ -281,7 +281,7 @@ for epoch in range(N_epochs):
      N_fr=int((signal.shape[0]-wlen)/(wshift))
      
 
-     sig_arr=np.zeros([Batch_dev,wlen])
+     sig_arr=torch.zeros([Batch_dev,wlen]).float().cuda().contiguous()
      lab= Variable((torch.zeros(N_fr+1)+lab_batch).cuda().contiguous().long())
      pout=Variable(torch.zeros(N_fr+1,class_lay[-1]).float().cuda().contiguous())
      count_fr=0
@@ -293,13 +293,13 @@ for epoch in range(N_epochs):
          count_fr=count_fr+1
          count_fr_tot=count_fr_tot+1
          if count_fr==Batch_dev:
-             inp=Variable(torch.from_numpy(sig_arr).float().cuda().contiguous())
+             inp=Variable(sig_arr)
              pout[count_fr_tot-Batch_dev:count_fr_tot,:]=DNN2_net(DNN1_net(CNN_net(inp)))
              count_fr=0
-             sig_arr=np.zeros([Batch_dev,wlen])
+             sig_arr=torch.zeros([Batch_dev,wlen]).float().cuda().contiguous()
    
      if count_fr>0:
-      inp=Variable(torch.from_numpy(sig_arr[0:count_fr]).float().cuda().contiguous())
+      inp=Variable(sig_arr[0:count_fr])
       pout[count_fr_tot-count_fr:count_fr_tot,:]=DNN2_net(DNN1_net(CNN_net(inp)))
 
     

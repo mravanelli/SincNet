@@ -5,7 +5,7 @@ SincNet is a neural architecture for processing **raw audio samples**. It is a n
 In contrast to standard CNNs, that learn all elements of each filter, only low and high cutoff frequencies are directly learned from data with the proposed method. This offers a very compact and efficient way to derive a **customized filter bank** specifically tuned for the desired application. 
 
 This project releases a collection of codes and utilities to perform speaker identification with SincNet.
-An example of speaker identification with the TIMIT database is provided. If you are interested to SincNet applied to speech recogntion you can take a look into the PyTorch-Kaldi github repository (https://github.com/mravanelli/pytorch-kaldi). 
+An example of speaker identification with the TIMIT database is provided. If you are interested in **SincNet applied to speech recognition you can take a look into the PyTorch-Kaldi github repository (https://github.com/mravanelli/pytorch-kaldi).** 
 
 <img src="https://github.com/mravanelli/SincNet/blob/master/SincNet.png" width="400" img align="right">
 
@@ -22,15 +22,19 @@ If you use this code or part of it, please cite us!
 - Python 3.6/2.7
 - pytorch 0.4.0
 - pysoundfile (``` conda install -c conda-forge pysoundfile```)
-- We also suggest to use the anaconda environment.
+- We also suggest using the anaconda environment.
 
+## Updates
+Feb, 16 2019:
+- We replaced the old "sinc_conv"  with "SincConv_fast". The latter is 50% faster.
+- In the near future, we plan to support SincNet based speaker-id within the [PyTorch-Kaldi project](https://github.com/mravanelli/pytorch-kaldi) (the current version of the project only supports SincNEt for speech recognition experiments). This will allow users to perform speaker recognition experiments in a faster and much more flexible environment. The current repository will anyway remain as a showcase. 
 
 ## How to run a TIMIT experiment
 Even though the code can be easily adapted to any speech dataset, in the following part of the documentation we provide an example based on the popular TIMIT dataset.
 
 **1. Run TIMIT data preparation.**
 
-This step is necessary to store a version of TIMIT in which start and end silences are removed and the amplitute of each speech utterance is normalized. To do it, run the following code:
+This step is necessary to store a version of TIMIT in which start and end silences are removed and the amplitude of each speech utterance is normalized. To do it, run the following code:
 
 ``
 python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER data_lists/TIMIT_all.scp
@@ -44,7 +48,7 @@ where:
 **2. Run the speaker id experiment.**
 
 - Modify the *[data]* section of *cfg/SincNet_TIMIT.cfg* file according to your paths. In particular, modify the *data_folder* with the *$OUTPUT_FOLDER* specified during the TIMIT preparation. The other parameters of the config file belong to the following sections:
- 1. *[windowing]*, that defines how each sentence is splitted into smaller chunks.
+ 1. *[windowing]*, that defines how each sentence is split into smaller chunks.
  2. *[cnn]*,  that specifies the characteristics of the CNN architecture.
  3. *[dnn]*,  that specifies the characteristics of the fully-connected DNN architecture following the CNN layers.
  4. *[class]*, that specify the softmax classification part.
@@ -56,7 +60,7 @@ where:
 python speaker_id.py --cfg=cfg/SincNet_TIMIT.cfg
 ``
 
-The network might take several hours to converge (depending on the speed of your GPU card). In our case, using an *nvidia TITAN X*, the full training took about 24 hours. If you use the code within a cluster is crucial to copy the normalized dataset into the local node, since the current version of the code requires frequent accesses to the stored wav files. Note that several possible optimizations to improve the code speed are not implemented in this version, since are out of the scope of this work.
+The network might take several hours to converge (depending on the speed of your GPU card). In our case, using an *nvidia TITAN X*, the full training took about 24 hours. If you use the code within a cluster is crucial to copy the normalized dataset into the local node, since the current version of the code requires frequent accesses to the stored wav files. Note that several possible optimizations to improve the code speed are not implemented in this version since are out of the scope of this work.
 
 **3. Results.**
 
@@ -82,6 +86,13 @@ epoch 352, loss_tr=0.031828 err_tr=0.009238 loss_te=4.080747 err_te=0.414066 err
 epoch 360, loss_tr=0.033095 err_tr=0.009600 loss_te=4.254683 err_te=0.419954 err_te_snt=0.005772
 ``` 
 The converge is initially very fast (see the first 30 epochs). After that the performance improvement decreases and oscillations into the sentence error rate performance appear. Despite these oscillations an average improvement trend can be observed for the subsequent epochs. In this experiment, we stopped our training  at epoch 360.
+The fields of the res.res generated res.res file have the following meaning:
+- loss_tr: is the average training loss (i.e., cross-entropy function) computed at every frame.
+- err_tr: is the classification error (measured at frame level) of the training data. Note that we split the speech signals into chunks of 200ms with 10ms overlap. The error is averaged for all the chunks of the training dataset.
+- loss_te is the average test loss (i.e., cross-entropy function) computed at every frame.
+- err_te: is the classification error (measured at frame level) of the test data.
+- err_te_snt: is the classification error (measured at sentence level) of the test data. Note that we slit the speech signal into chunks of 200ms with 10ms overlap. For each chunk, our SincNet performs a prediction over the set of speakers. To compute this classification error rare we averaged the predictions and, for each sentence, we decided for the speaker with the highest average probability.
+-
 
 ## Where SincNet is implemented?
 To take a look into the SincNet implementation you should open the file *dnn_models.py* and read the classes *SincNet*, *sinc_conv* and the function *sinc*.
@@ -90,12 +101,12 @@ To take a look into the SincNet implementation you should open the file *dnn_mod
 In this repository, we used the TIMIT dataset as a tutorial to show how SincNet works. 
 With the current version of the code, you can easily use a different corpus. To do it you should provide in input the corpora-specific input files (in wav format) and your own labels. You should thus modify the paths into the *.scp files you find in the data_lists folder. 
 
-To assign to each sentence the right label, you also have modify the dictionary "*TIMIT_labels.npy*". 
-The labels are  specified within a python dictionary that contains sentence ids as keys (e.g., "*si1027*") and speaker_ids as values. Each speaker_id is an integer, ranging from 0 to N_spks-1. In the TIMIT dataset, you can easily retrieve the speaker id from the path (e.g., *train/dr1/fcjf0/si1027.wav* is the sentence_id "*si1027*" uttered by the speaker "*fcjf0*"). For other datasets, you should be able to retrieve in such a way this dictionary containing pairs of speaker and sentence ids.
+To assign to each sentence the right label, you also have to modify the dictionary "*TIMIT_labels.npy*". 
+The labels are specified within a python dictionary that contains sentence ids as keys (e.g., "*si1027*") and speaker_ids as values. Each speaker_id is an integer, ranging from 0 to N_spks-1. In the TIMIT dataset, you can easily retrieve the speaker id from the path (e.g., *train/dr1/fcjf0/si1027.wav* is the sentence_id "*si1027*" uttered by the speaker "*fcjf0*"). For other datasets, you should be able to retrieve in such a way this dictionary containing pairs of speakers and sentence ids.
 
 You should then modify the config file (*cfg/SincNet_TIMIT.cfg*) according to your new paths. Remember also to change the field "*class_lay=462*" according to the number of speakers N_spks you have in your dataset.
 
-**The version of the Librispeech dataset used in the paper is available upon request**. In our work, we have used only 12-15 seconds of training material for each speaker and we processed the original librispeech sentences in order to perform amplitude normalization. Moreover, we used a simple energy-based VAD to avoid silences at the beginning and end of each sentence as well as to split in multiple chunks the sentences that contains longer silence
+**The version of the Librispeech dataset used in the paper is available upon request**. In our work, we have used only 12-15 seconds of training material for each speaker and we processed the original librispeech sentences in order to perform amplitude normalization. Moreover, we used a simple energy-based VAD to avoid silences at the beginning and end of each sentence as well as to split in multiple chunks the sentences that contain longer silence
 
 
 
