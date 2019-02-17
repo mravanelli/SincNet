@@ -168,6 +168,9 @@ with torch.no_grad():
     for i in range(snt_te):
            
          [signal, fs] = sf.read(wav_lst_te[i])
+         
+         # Amplitude normalization
+         signal=signal/np.max(np.abs(signal))
         
          signal=torch.from_numpy(signal).float().cuda().contiguous()
         
