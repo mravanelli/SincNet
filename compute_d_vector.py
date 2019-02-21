@@ -182,7 +182,7 @@ with torch.no_grad():
          
         
          sig_arr=torch.zeros([Batch_dev,wlen]).float().cuda().contiguous()
-         dvects=Variable(torch.zeros(N_fr+1,d_vector_dim).float().cuda().contiguous())
+         dvects=Variable(torch.zeros(N_fr,d_vector_dim).float().cuda().contiguous())
          count_fr=0
          count_fr_tot=0
          while end_samp<signal.shape[0]:
