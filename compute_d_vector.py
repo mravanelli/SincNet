@@ -17,14 +17,16 @@ import numpy as np
 from dnn_models import MLP
 from dnn_models import SincNet as CNN 
 from data_io import ReadList,read_conf_inp,str_to_bool
-
+import sys
 
 # Model to use for computing the d-vectors
 model_file='/home/mirco/SincNet/exp/SincNet_TIMIT/model_raw.pkl' # This is the model to use for computing the d-vectors (it should be pre-trained using the speaker-id DNN)
-cfg_file='/home/mirco/SincNet/cfg/SincNet_TIMIT.cfg' # Config file of the speaker-id experiment used to generate the model
+cfg_file='/home/mirco/SincNet/exp/SincNet_TIMIT/SincNet_TIMIT.cfg' # Config file of the speaker-id experiment used to generate the model
 te_lst='data_lists/TIMIT_test.scp' # List of the wav files to process
 out_dict_file='d_vect_timit.npy' # output dictionary containing the a sentence id as key as the d-vector as value
 
+avoid_small_en_fr=True
+energy_th = 0.1  # Avoid frames with an energy that is 1/10 over the average energy
 
 # Reading cfg file
 options=read_conf_inp(cfg_file)
@@ -174,6 +176,34 @@ with torch.no_grad():
         
          signal=torch.from_numpy(signal).float().cuda().contiguous()
         
+         if avoid_small_en_fr: 
+             # computing energy on each frame:
+             beg_samp=0
+             end_samp=wlen
+    
+             N_fr=int((signal.shape[0]-wlen)/(wshift))
+             Batch_dev=N_fr
+             en_arr=Variable(torch.zeros(N_fr).float().cuda().contiguous())
+             count_fr=0
+             count_fr_tot=0
+             while end_samp<signal.shape[0]:
+                en_arr[count_fr]=torch.sum(signal[beg_samp:end_samp].pow(2))
+                beg_samp=beg_samp+wshift
+                end_samp=beg_samp+wlen
+                count_fr=count_fr+1
+                count_fr_tot=count_fr_tot+1
+                if count_fr==N_fr:
+                    break
+    
+             en_arr_bin=en_arr>torch.mean(en_arr)*0.1
+             n_vect_elem=torch.sum(en_arr_bin)
+    
+             if n_vect_elem<10:
+                 print('only few elements used to compute d-vectors')
+                 sys.exit(0)
+
+
+
          # split signals into chunks
          beg_samp=0
          end_samp=wlen
@@ -201,8 +231,19 @@ with torch.no_grad():
           inp=Variable(sig_arr[0:count_fr])
           dvects[count_fr_tot-count_fr:count_fr_tot,:]=DNN1_net(CNN_net(inp))
         
+         if avoid_small_en_fr: 
+             dvects=dvects.index_select(0, torch.LongTensor((en_arr_bin.cpu()==1).nonzero().view(-1)))
+         
          # averaging and normalizing all the d-vectors
          d_vect_out=torch.mean(dvects/dvects.norm(p=2, dim=1).view(-1,1),dim=0)
+         
+         # checks for nan
+         nan_sum=torch.sum(torch.isnan(d_vect_out))
+
+         if nan_sum>0:
+             print(wav_lst_te[i])
+             sys.exit(0)
+
          
          # saving the d-vector in a numpy dictionary
          dict_key=wav_lst_te[i].split('/')[-2]+'/'+wav_lst_te[i].split('/')[-1]
