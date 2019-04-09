@@ -20,7 +20,7 @@ If you use this code or part of it, please cite us!
 ## Prerequisites
 - Linux
 - Python 3.6/2.7
-- pytorch 0.4.0
+- pytorch 1.0
 - pysoundfile (``` conda install -c conda-forge pysoundfile```)
 - We also suggest using the anaconda environment.
 
