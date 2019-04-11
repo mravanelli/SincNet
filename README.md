@@ -62,6 +62,7 @@ python speaker_id.py --cfg=cfg/SincNet_TIMIT.cfg
 
 The network might take several hours to converge (depending on the speed of your GPU card). In our case, using an *nvidia TITAN X*, the full training took about 24 hours. If you use the code within a cluster is crucial to copy the normalized dataset into the local node, since the current version of the code requires frequent accesses to the stored wav files. Note that several possible optimizations to improve the code speed are not implemented in this version since are out of the scope of this work.
 
+
 **3. Results.**
 
 The results are saved into the *output_folder* specified in the cfg file. In this folder, you can find a file (*res.res*) summarizing training and test error rates. The model *model_raw.pkl* is the SincNet model saved after the last iteration. 
@@ -93,6 +94,7 @@ The fields of the res.res file have the following meaning:
 - err_te: is the classification error (measured at frame level) of the test data.
 - err_te_snt: is the classification error (measured at sentence level) of the test data. Note that we split the speech signal into chunks of 200ms with 10ms overlap. For each chunk, our SincNet performs a prediction over the set of speakers. To compute this classification error rate we averaged the predictions and, for each sentence, we voted for the speaker with the highest average probability.
 
+[You can find our trained model for TIMIT here.](https://bitbucket.org/mravanelli/sincnet_models/)
 
 ## Where SincNet is implemented?
 To take a look into the SincNet implementation you should open the file *dnn_models.py* and read the classes *SincNet*, *sinc_conv* and the function *sinc*.
