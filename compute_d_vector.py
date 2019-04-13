@@ -20,13 +20,17 @@ from data_io import ReadList,read_conf_inp,str_to_bool
 import sys
 
 # Model to use for computing the d-vectors
-model_file='/home/mirco/SincNet/exp/SincNet_TIMIT/model_raw.pkl' # This is the model to use for computing the d-vectors (it should be pre-trained using the speaker-id DNN)
-cfg_file='/home/mirco/SincNet/exp/SincNet_TIMIT/SincNet_TIMIT.cfg' # Config file of the speaker-id experiment used to generate the model
+model_file='/home/mirco/sincnet_models/SincNet_TIMIT/model_raw.pkl' # This is the model to use for computing the d-vectors (it should be pre-trained using the speaker-id DNN)
+cfg_file='/home/mirco/SincNet/cfg/SincNet_TIMIT.cfg' # Config file of the speaker-id experiment used to generate the model
 te_lst='data_lists/TIMIT_test.scp' # List of the wav files to process
 out_dict_file='d_vect_timit.npy' # output dictionary containing the a sentence id as key as the d-vector as value
+data_folder='/home/mirco/Dataset/TIMIT_norm_nosil'
 
 avoid_small_en_fr=True
 energy_th = 0.1  # Avoid frames with an energy that is 1/10 over the average energy
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#device = None
 
 # Reading cfg file
 options=read_conf_inp(cfg_file)
@@ -34,8 +38,6 @@ options=read_conf_inp(cfg_file)
 
 #[data]
 pt_file=options.pt_file
-class_dict_file=options.lab_dict
-data_folder=options.data_folder+'/'
 output_folder=options.output_folder
 
 #[windowing]
@@ -112,10 +114,7 @@ CNN_arch = {'input_dim': wlen,
           }
 
 CNN_net=CNN(CNN_arch)
-CNN_net.cuda()
-
-# Loading label dictionary
-lab_dict=np.load(class_dict_file).item()
+CNN_net.to(device)
 
 
 
@@ -130,7 +129,7 @@ DNN1_arch = {'input_dim': CNN_net.out_dim,
           }
 
 DNN1_net=MLP(DNN1_arch)
-DNN1_net.cuda()
+DNN1_net.to(device)
 
 
 DNN2_arch = {'input_dim':fc_lay[-1] ,
@@ -145,7 +144,7 @@ DNN2_arch = {'input_dim':fc_lay[-1] ,
 
 
 DNN2_net=MLP(DNN2_arch)
-DNN2_net.cuda()
+DNN2_net.to(device)
 
 
 checkpoint_load = torch.load(model_file)
@@ -169,12 +168,12 @@ with torch.no_grad():
     
     for i in range(snt_te):
            
-         [signal, fs] = sf.read(wav_lst_te[i])
+         [signal, fs] = sf.read(data_folder+'/'+wav_lst_te[i])
          
          # Amplitude normalization
          signal=signal/np.max(np.abs(signal))
         
-         signal=torch.from_numpy(signal).float().cuda().contiguous()
+         signal=torch.from_numpy(signal).float().to(device).contiguous()
         
          if avoid_small_en_fr: 
              # computing energy on each frame:
@@ -183,7 +182,7 @@ with torch.no_grad():
     
              N_fr=int((signal.shape[0]-wlen)/(wshift))
              Batch_dev=N_fr
-             en_arr=Variable(torch.zeros(N_fr).float().cuda().contiguous())
+             en_arr=torch.zeros(N_fr).float().contiguous().to(device)
              count_fr=0
              count_fr_tot=0
              while end_samp<signal.shape[0]:
@@ -196,6 +195,7 @@ with torch.no_grad():
                     break
     
              en_arr_bin=en_arr>torch.mean(en_arr)*0.1
+             en_arr_bin.to(device)
              n_vect_elem=torch.sum(en_arr_bin)
     
              if n_vect_elem<10:
@@ -211,8 +211,8 @@ with torch.no_grad():
          N_fr=int((signal.shape[0]-wlen)/(wshift))
          
         
-         sig_arr=torch.zeros([Batch_dev,wlen]).float().cuda().contiguous()
-         dvects=Variable(torch.zeros(N_fr,d_vector_dim).float().cuda().contiguous())
+         sig_arr=torch.zeros([Batch_dev,wlen]).float().to(device).contiguous()
+         dvects=Variable(torch.zeros(N_fr,d_vector_dim).float().to(device).contiguous())
          count_fr=0
          count_fr_tot=0
          while end_samp<signal.shape[0]:
@@ -225,14 +225,14 @@ with torch.no_grad():
                  inp=Variable(sig_arr)
                  dvects[count_fr_tot-Batch_dev:count_fr_tot,:]=DNN1_net(CNN_net(inp))
                  count_fr=0
-                 sig_arr=torch.zeros([Batch_dev,wlen]).float().cuda().contiguous()
+                 sig_arr=torch.zeros([Batch_dev,wlen]).float().to(device).contiguous()
            
          if count_fr>0:
           inp=Variable(sig_arr[0:count_fr])
           dvects[count_fr_tot-count_fr:count_fr_tot,:]=DNN1_net(CNN_net(inp))
         
-         if avoid_small_en_fr: 
-             dvects=dvects.index_select(0, torch.LongTensor((en_arr_bin.cpu()==1).nonzero().view(-1)))
+         if avoid_small_en_fr:
+             dvects=dvects.index_select(0, (en_arr_bin==1).nonzero().view(-1))
          
          # averaging and normalizing all the d-vectors
          d_vect_out=torch.mean(dvects/dvects.norm(p=2, dim=1).view(-1,1),dim=0)
