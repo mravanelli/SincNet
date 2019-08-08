@@ -60,7 +60,7 @@ for i in range(len(list_sig)):
  signal=signal.astype(np.float64)
 
  # Signal normalization
- signal=signal/np.abs(np.max(signal))
+ signal=signal/np.max(np.abs(signal))
 
  # Read wrd file
  wrd_file=wav_file.replace(".wav",".wrd")
