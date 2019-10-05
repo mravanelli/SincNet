@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-# TIMIT_preparation 
-# Mirco Ravanelli 
-# Mila - University of Montreal 
+# TIMIT_preparation
+# Mirco Ravanelli
+# Mila - University of Montreal
 
 # July 2018
 
-# Description: 
-# This code prepares TIMIT for the following speaker identification experiments. 
+# Description:
+# This code prepares TIMIT for the following speaker identification experiments.
 # It removes start and end silences according to the information reported in the *.wrd files and normalizes the amplitude of each sentence.
 
 # How to run it:
-# python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER data_lists/TIMIT_all.scp 
+# python TIMIT_preparation.py $TIMIT_FOLDER $OUTPUT_FOLDER data_lists/TIMIT_all.scp
 
 # NOTE: This script expects filenames in lowercase (e.g, train/dr1/fcjf0/si1027.wav" rather than "TRAIN/DR1/FCJF0/SI1027.WAV)
 

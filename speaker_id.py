@@ -1,10 +1,10 @@
 # speaker_id.py
-# Mirco Ravanelli 
-# Mila - University of Montreal 
+# Mirco Ravanelli
+# Mila - University of Montreal
 
 # July 2018
 
-# Description: 
+# Description:
 # This code performs a speaker_id experiments with SincNet.
 
 # How to run it:
