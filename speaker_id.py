@@ -64,7 +64,7 @@ def create_batches_rnd(batch_size, data_folder, wav_lst, N_snt, wlen, lab_dict, 
 
 # Reading cfg file
 options = read_conf()
-
+print(options)
 # [data]
 tr_lst = options.tr_lst
 te_lst = options.te_lst
@@ -199,8 +199,9 @@ optimizer_CNN = optim.RMSprop(CNN_net.parameters(), lr=lr, alpha=0.95, eps=1e-8)
 optimizer_DNN1 = optim.RMSprop(DNN1_net.parameters(), lr=lr, alpha=0.95, eps=1e-8)
 optimizer_DNN2 = optim.RMSprop(DNN2_net.parameters(), lr=lr, alpha=0.95, eps=1e-8)
 
+print('localtime when starting:', time.localtime())
 for epoch in range(N_epochs):
-
+  epoch_start = time.monotonic()
   test_flag = 0
   CNN_net.train()
   DNN1_net.train()
@@ -295,12 +296,12 @@ for epoch in range(N_epochs):
       loss_tot_dev = loss_sum / snt_te
       err_tot_dev = err_sum / snt_te
 
-    print("epoch %i, loss_tr=%f err_tr=%f loss_te=%f err_te=%f err_te_snt=%f" % (
-    epoch, loss_tot, err_tot, loss_tot_dev, err_tot_dev, err_tot_dev_snt))
+    print("epoch %i, loss_tr=%f err_tr=%f loss_te=%f err_te=%f err_te_snt=%f time=%f" % (
+      epoch, loss_tot, err_tot, loss_tot_dev, err_tot_dev, err_tot_dev_snt, time.monotonic() - epoch_start))
 
     with open(output_folder + "/res.res", "a") as res_file:
-      res_file.write("epoch %i, loss_tr=%f err_tr=%f loss_te=%f err_te=%f err_te_snt=%f\n" % (
-      epoch, loss_tot, err_tot, loss_tot_dev, err_tot_dev, err_tot_dev_snt))
+      res_file.write("epoch %i, loss_tr=%f err_tr=%f loss_te=%f err_te=%f err_te_snt=%f time=%f\n" % (
+        epoch, loss_tot, err_tot, loss_tot_dev, err_tot_dev, err_tot_dev_snt, time.monotonic() - epoch_start))
 
     checkpoint = {'CNN_model_par': CNN_net.state_dict(),
                   'DNN1_model_par': DNN1_net.state_dict(),
@@ -309,4 +310,5 @@ for epoch in range(N_epochs):
     torch.save(checkpoint, output_folder + '/model_raw.pkl')
 
   else:
-    print("epoch %i, loss_tr=%f err_tr=%f" % (epoch, loss_tot, err_tot))
+    print("epoch %i, loss_tr=%f err_tr=%f time=%f" % (
+      epoch, loss_tot, err_tot, time.monotonic() - epoch_start))
