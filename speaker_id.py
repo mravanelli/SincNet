@@ -156,7 +156,7 @@ CNN_net_out_dim = CNN_net.out_dim
 CNN_net.cuda(device)
 
 # Loading label dictionary
-lab_dict = np.load(class_dict_file).item()
+lab_dict = np.load(class_dict_file, allow_pickle=True).item()
 
 DNN1_arch = {'input_dim': CNN_net_out_dim,
              'fc_lay': fc_lay,
