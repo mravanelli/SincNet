@@ -115,7 +115,7 @@ def create_batches_rnd(batch_size, data_folder, wav_lst, N_snt, wlen, lab_dict, 
 
 def read_conf_inp(cfg_file):
   parser = OptionParser()
-  (options, args) = parser.parse_args()
+  (options, args) = parser.parse_args([])
 
   Config = ConfigParser.ConfigParser()
   Config.read(cfg_file)
