@@ -49,9 +49,8 @@ def create_batches_rnd(batch_size, data_folder, wav_lst, N_snt, wlen, lab_dict, 
     snt_end = snt_beg + wlen
 
     channels = len(signal.shape)
-    if channels == 2:
-      print('WARNING: stereo to mono: ' + data_folder + wav_lst[snt_id_arr[i]])
-      signal = signal[:, 0]
+    if channels >= 2:
+      assert False
 
     sig_batch[i, :] = signal[snt_beg:snt_end] * rand_amp_arr[i]
     lab_batch[i] = lab_dict[wav_lst[snt_id_arr[i]]]
