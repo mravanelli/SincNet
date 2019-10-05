@@ -1,8 +1,5 @@
 import configparser as ConfigParser
 from optparse import OptionParser
-import numpy as np
-# import scipy.io.wavfile
-import torch
 
 
 def ReadList(list_file):
@@ -83,35 +80,6 @@ def str_to_bool(s):
     return False
   else:
     raise ValueError
-
-
-def create_batches_rnd(batch_size, data_folder, wav_lst, N_snt, wlen, lab_dict, fact_amp):
-  # Initialization of the minibatch (batch_size,[0=>x_t,1=>x_t+N,1=>random_samp])
-  sig_batch = np.zeros([batch_size, wlen])
-  lab_batch = np.zeros(batch_size)
-
-  snt_id_arr = np.random.randint(N_snt, size=batch_size)
-
-  rand_amp_arr = np.random.uniform(1.0 - fact_amp, 1 + fact_amp, batch_size)
-
-  for i in range(batch_size):
-    # select a random sentence from the list  (joint distribution)
-    [fs, signal] = scipy.io.wavfile.read(data_folder + wav_lst[snt_id_arr[i]])
-    signal = signal.astype(float) / 32768
-
-    # accesing to a random chunk
-    snt_len = signal.shape[0]
-    snt_beg = np.random.randint(snt_len - wlen - 1)  # randint(0, snt_len-2*wlen-1)
-    snt_end = snt_beg + wlen
-
-    sig_batch[i, :] = signal[snt_beg:snt_end] * rand_amp_arr[i]
-    lab_batch[i] = lab_dict[wav_lst[snt_id_arr[i]]]
-
-  inp = torch.from_numpy(sig_batch).float().cuda().contiguous()  # Current Frame
-  lab = torch.from_numpy(lab_batch).float().cuda().contiguous()
-
-  return inp, lab
-
 
 def read_conf_inp(cfg_file):
   parser = OptionParser()
