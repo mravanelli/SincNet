@@ -11,20 +11,23 @@
 # python speaker_id.py --cfg=cfg/SincNet_TIMIT.cfg
 
 import os
-# import scipy.io.wavfile
-import soundfile as sf
+import random
+import time
+
+import dataset
+import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-from torch.autograd import Variable
+import soundfile as sf
 
-import sys
-import numpy as np
-from dnn_models import MLP, flip
+from data_io import ReadList
+from data_io import read_conf
+from data_io import str_to_bool
+from dnn_models import MLP
 from dnn_models import SincNet as CNN
-from data_io import ReadList, read_conf, str_to_bool
 
+device = torch.device(f"cuda:{device_ids[0]}" if torch.cuda.is_available() else "cpu")
 
 def create_batches_rnd(batch_size, data_folder, wav_lst, N_snt, wlen, lab_dict, fact_amp):
   # Initialization of the minibatch (batch_size,[0=>x_t,1=>x_t+N,1=>random_samp])
@@ -36,16 +39,11 @@ def create_batches_rnd(batch_size, data_folder, wav_lst, N_snt, wlen, lab_dict, 
   rand_amp_arr = np.random.uniform(1.0 - fact_amp, 1 + fact_amp, batch_size)
 
   for i in range(batch_size):
+    signal, _ = sf.read(data_folder + wav_lst[snt_id_arr[i]])
 
-    # select a random sentence from the list
-    # [fs,signal]=scipy.io.wavfile.read(data_folder+wav_lst[snt_id_arr[i]])
-    # signal=signal.astype(float)/32768
-
-    [signal, fs] = sf.read(data_folder + wav_lst[snt_id_arr[i]])
-
-    # accesing to a random chunk
+    # accessing to a random chunk
     snt_len = signal.shape[0]
-    snt_beg = np.random.randint(snt_len - wlen - 1)  # randint(0, snt_len-2*wlen-1)
+    snt_beg = np.random.randint(snt_len - wlen - 1)
     snt_end = snt_beg + wlen
 
     channels = len(signal.shape)
@@ -55,8 +53,8 @@ def create_batches_rnd(batch_size, data_folder, wav_lst, N_snt, wlen, lab_dict, 
     sig_batch[i, :] = signal[snt_beg:snt_end] * rand_amp_arr[i]
     lab_batch[i] = lab_dict[wav_lst[snt_id_arr[i]]]
 
-  inp = Variable(torch.from_numpy(sig_batch).float().cuda().contiguous())
-  lab = Variable(torch.from_numpy(lab_batch).float().cuda().contiguous())
+  inp = torch.from_numpy(sig_batch).float().cuda(device).contiguous()
+  lab = torch.from_numpy(lab_batch).float().cuda(device).contiguous()
 
   return inp, lab
 
@@ -139,9 +137,6 @@ cost = nn.NLLLoss()
 wlen = int(fs * cw_len / 1000.00)
 wshift = int(fs * cw_shift / 1000.00)
 
-# Batch_dev
-Batch_dev = 128
-
 # Feature extractor CNN
 CNN_arch = {'input_dim': wlen,
             'fs': fs,
@@ -157,12 +152,13 @@ CNN_arch = {'input_dim': wlen,
             }
 
 CNN_net = CNN(CNN_arch)
-CNN_net.cuda()
+CNN_net_out_dim = CNN_net.out_dim
+CNN_net.cuda(device)
 
 # Loading label dictionary
 lab_dict = np.load(class_dict_file).item()
 
-DNN1_arch = {'input_dim': CNN_net.out_dim,
+DNN1_arch = {'input_dim': CNN_net_out_dim,
              'fc_lay': fc_lay,
              'fc_drop': fc_drop,
              'fc_use_batchnorm': fc_use_batchnorm,
@@ -173,7 +169,7 @@ DNN1_arch = {'input_dim': CNN_net.out_dim,
              }
 
 DNN1_net = MLP(DNN1_arch)
-DNN1_net.cuda()
+DNN1_net.cuda(device)
 
 DNN2_arch = {'input_dim': fc_lay[-1],
              'fc_lay': class_lay,
@@ -186,7 +182,7 @@ DNN2_arch = {'input_dim': fc_lay[-1],
              }
 
 DNN2_net = MLP(DNN2_arch)
-DNN2_net.cuda()
+DNN2_net.cuda(device)
 
 if pt_file != 'none':
   checkpoint_load = torch.load(pt_file)
@@ -245,41 +241,33 @@ for epoch in range(N_epochs):
 
     with torch.no_grad():
       for i in range(snt_te):
-
-        # [fs,signal]=scipy.io.wavfile.read(data_folder+wav_lst_te[i])
-        # signal=signal.astype(float)/32768
-
-        [signal, fs] = sf.read(data_folder + wav_lst_te[i])
-
-        signal = torch.from_numpy(signal).float().cuda().contiguous()
+        signal, _ = sf.read(data_folder + wav_lst_te[i])
         lab_batch = lab_dict[wav_lst_te[i]]
 
-        # split signals into chunks
-        beg_samp = 0
-        end_samp = wlen
+        # 1 2 3 4 5 6 7 8 9 10 11 12 13
+        # stride = 3
+        # window = 5
+        # we should have (13 - 5) // 3 + 1 = 3 examples
+        # for we have (13 - 5) segments, each segment corresponds to a left end point,
+        # and each left point corresponds to one example,
+        # plus the one at the end
+        # 1 2 3 4 5
+        # 4 5 6 7 8
+        # 7 8 9 10 11
 
-        N_fr = int((signal.shape[0] - wlen) / (wshift))
-
-        sig_arr = torch.zeros([Batch_dev, wlen]).float().cuda().contiguous()
-        lab = Variable((torch.zeros(N_fr + 1) + lab_batch).cuda().contiguous().long())
-        pout = Variable(torch.zeros(N_fr + 1, class_lay[-1]).float().cuda().contiguous())
-        count_fr = 0
-        count_fr_tot = 0
-        while end_samp < signal.shape[0]:
-          sig_arr[count_fr, :] = signal[beg_samp:end_samp]
-          beg_samp = beg_samp + wshift
+        N_fr_actual = 0
+        N_fr = (signal.shape[0] - wlen) // wshift + 1
+        sig_arr = torch.zeros([N_fr, wlen]).float().cuda(device).contiguous()
+        lab = (torch.zeros(N_fr) + lab_batch).cuda(device).contiguous().long()
+        for i_sig, beg_samp in enumerate(range(0, signal.shape[0], wshift)):
           end_samp = beg_samp + wlen
-          count_fr = count_fr + 1
-          count_fr_tot = count_fr_tot + 1
-          if count_fr == Batch_dev:
-            inp = Variable(sig_arr)
-            pout[count_fr_tot - Batch_dev:count_fr_tot, :] = DNN2_net(DNN1_net(CNN_net(inp)))
-            count_fr = 0
-            sig_arr = torch.zeros([Batch_dev, wlen]).float().cuda().contiguous()
-
-        if count_fr > 0:
-          inp = Variable(sig_arr[0:count_fr])
-          pout[count_fr_tot - count_fr:count_fr_tot, :] = DNN2_net(DNN1_net(CNN_net(inp)))
+          if end_samp > signal.shape[0]:
+            break
+          else:
+            sig_arr[i_sig] = signal[beg_samp:end_samp]
+            N_fr_actual += 1
+        assert N_fr_actual == N_fr
+        pout = DNN2_net(DNN1_net(CNN_net(sig_arr)))
 
         pred = torch.max(pout, dim=1)[1]
         loss = cost(pout, lab.long())
