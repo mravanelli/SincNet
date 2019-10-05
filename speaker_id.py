@@ -305,9 +305,8 @@ for epoch in range(N_epochs):
 
     checkpoint = {'CNN_model_par': CNN_net.state_dict(),
                   'DNN1_model_par': DNN1_net.state_dict(),
-                  'DNN2_model_par': DNN2_net.state_dict(),
-                  }
-    torch.save(checkpoint, output_folder + '/model_raw.pkl')
+                  'DNN2_model_par': DNN2_net.state_dict()}
+    torch.save(checkpoint, output_folder + f'/model_raw_{epoch}.pkl')
 
   else:
     print("epoch %i, loss_tr=%f err_tr=%f time=%f" % (
