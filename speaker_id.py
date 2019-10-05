@@ -27,7 +27,11 @@ from data_io import str_to_bool
 from dnn_models import MLP
 from dnn_models import SincNet as CNN
 
-device = torch.device(f"cuda:{device_ids[0]}" if torch.cuda.is_available() else "cpu")
+IS_DATA_PARALLEL = False
+DEVICE_IDS = [0]
+# IS_DATA_PARALLEL = True
+# DEVICE_IDS = list(range(8))
+device = torch.device(f"cuda:{DEVICE_IDS[0]}")
 
 def create_batches_rnd(batch_size, data_folder, wav_lst, N_snt, wlen, lab_dict, fact_amp):
   # Initialization of the minibatch (batch_size,[0=>x_t,1=>x_t+N,1=>random_samp])
@@ -153,6 +157,8 @@ CNN_arch = {'input_dim': wlen,
 
 CNN_net = CNN(CNN_arch)
 CNN_net_out_dim = CNN_net.out_dim
+if IS_DATA_PARALLEL:
+  CNN_net = nn.DataParallel(CNN_net, device_ids=DEVICE_IDS)
 CNN_net.cuda(device)
 
 # Loading label dictionary
@@ -169,6 +175,8 @@ DNN1_arch = {'input_dim': CNN_net_out_dim,
              }
 
 DNN1_net = MLP(DNN1_arch)
+if IS_DATA_PARALLEL:
+  DNN1_net = nn.DataParallel(DNN1_net, device_ids=DEVICE_IDS)
 DNN1_net.cuda(device)
 
 DNN2_arch = {'input_dim': fc_lay[-1],
@@ -182,6 +190,8 @@ DNN2_arch = {'input_dim': fc_lay[-1],
              }
 
 DNN2_net = MLP(DNN2_arch)
+if IS_DATA_PARALLEL:
+  DNN2_net = nn.DataParallel(DNN2_net, device_ids=DEVICE_IDS)
 DNN2_net.cuda(device)
 
 if pt_file != 'none':
