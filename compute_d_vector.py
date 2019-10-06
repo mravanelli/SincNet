@@ -163,6 +163,8 @@ def audio_samples_to_d_vectors(signal: np.ndarray):
     if avoid_small_en_fr:
       d_vectors = d_vectors.index_select(0, (en_arr_bin == 1).nonzero().view(-1))
 
+    if d_vectors.shape[0] == 0:
+      raise Exception('Empty d-vectors')
     return d_vectors.cpu().numpy()
 
 
