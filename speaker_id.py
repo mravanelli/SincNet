@@ -265,7 +265,7 @@ for epoch in range(N_epochs):
 
         N_fr_actual = 0
         N_fr = (signal.shape[0] - wlen) // wshift + 1
-        sig_arr = torch.zeros([N_fr, wlen]).float().cuda(device).contiguous()
+        sig_arr = np.zeros((N_fr, wlen), dtype=np.float32)
         lab = (torch.zeros(N_fr) + lab_batch).cuda(device).contiguous().long()
         for i_sig, beg_samp in enumerate(range(0, signal.shape[0], wshift)):
           end_samp = beg_samp + wlen
@@ -275,6 +275,7 @@ for epoch in range(N_epochs):
             sig_arr[i_sig] = signal[beg_samp:end_samp]
             N_fr_actual += 1
         assert N_fr_actual == N_fr
+        sig_arr = torch.from_numpy(sig_arr).cuda(device).contiguous()
         pout = DNN2_net(DNN1_net(CNN_net(sig_arr)))
 
         pred = torch.max(pout, dim=1)[1]
