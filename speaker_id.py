@@ -11,10 +11,8 @@
 # python speaker_id.py --cfg=cfg/SincNet_TIMIT.cfg
 
 import os
-import random
 import time
 
-import dataset
 import numpy as np
 import torch
 import torch.nn as nn
