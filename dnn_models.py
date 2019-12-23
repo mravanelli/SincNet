@@ -108,7 +108,7 @@ class SincConv_fast(nn.Module):
         self.window_=0.54-0.46*torch.cos(2*math.pi*n_lin/self.kernel_size);
 
 
-        # (kernel_size, 1)
+        # (1, kernel_size/2)
         n = (self.kernel_size - 1) / 2.0
         self.n_ = 2*math.pi*torch.arange(-n, 0).view(1, -1) / self.sample_rate # Due to symmetry, I only need half of the time axes
 
