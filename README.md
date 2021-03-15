@@ -24,6 +24,10 @@ If you use this code or part of it, please cite us!
 - pysoundfile (``` conda install -c conda-forge pysoundfile```)
 - We also suggest using the anaconda environment.
 
+## SpeechBrain
+SincNet is implemented in the SpeechBrain (https://speechbrain.github.io/) project as well. We encourage you to take a look into it as well!
+It is an all-in-one pytorch-based speech processing toolkit that currently supports speech recognition, speaker recognition, SLU, speech enhancement, speech separation, multi-microphone signal processing. It is designed to be flexible, easy-to-use, modular, and well documented. [Check it out](https://speechbrain.github.io/).
+
 ## Updates
 Feb, 16 2019:
 - We replaced the old "sinc_conv"  with "SincConv_fast". The latter is 50% faster.
