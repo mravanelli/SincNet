@@ -53,8 +53,10 @@ def create_batches_rnd(batch_size,data_folder,wav_lst,N_snt,wlen,lab_dict,fact_a
   if channels == 2:
     print('WARNING: stereo to mono: '+data_folder+wav_lst[snt_id_arr[i]])
     signal = signal[:,0]
+
+  rand_noise_arr = np.random.normal(0, 1e-20, len(signal))
   
-  sig_batch[i,:]=signal[snt_beg:snt_end]*rand_amp_arr[i]
+  sig_batch[i,:]=signal[snt_beg:snt_end]*rand_amp_arr[i]+rand_noise_arr[snt_beg:snt_end]
   lab_batch[i]=lab_dict[wav_lst[snt_id_arr[i]]]
   
  inp=Variable(torch.from_numpy(sig_batch).float().cuda().contiguous())
@@ -291,8 +293,9 @@ for epoch in range(N_epochs):
      pout=Variable(torch.zeros(N_fr+1,class_lay[-1]).float().cuda().contiguous())
      count_fr=0
      count_fr_tot=0
+     rand_noise_arr = np.random.normal(0, 1e-20, len(signal))
      while end_samp<signal.shape[0]:
-         sig_arr[count_fr,:]=signal[beg_samp:end_samp]
+         sig_arr[count_fr,:]=signal[beg_samp:end_samp]+rand_noise_arr[beg_samp:end_samp]
          beg_samp=beg_samp+wshift
          end_samp=beg_samp+wlen
          count_fr=count_fr+1
