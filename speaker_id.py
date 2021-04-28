@@ -170,7 +170,7 @@ CNN_net=CNN(CNN_arch)
 CNN_net.cuda()
 
 # Loading label dictionary
-lab_dict=np.load(class_dict_file).item()
+lab_dict=np.load(class_dict_file, allow_pickle=True).item()
 
 
 
